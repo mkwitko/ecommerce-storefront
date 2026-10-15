@@ -29,12 +29,12 @@ flowchart LR
 
 ## Evidence map
 
-- [Project architecture](docs/ARCHITECTURE.md) — SSR, API contract, authentication and session restoration.
-- [Visual system](docs/DESIGN.md) — shared design choices and constraints.
-- [Public landing implementation](src/routes/index.tsx) — route loader and metadata.
-- [Generated API integration](src/lib/api/) — client utilities and generated output.
-- [E2E test cases](e2e/) — storefront navigation, donations, checkout and management scenarios.
-- [CI source](.github/workflows/ci.yml) — quality and Playwright workflows; see current Actions runs for their actual status.
+- [Project architecture](ARCHITECTURE.md) — SSR, API contract, authentication and session restoration.
+- [Visual system](DESIGN.md) — shared design choices and constraints.
+- [Public landing implementation](../src/routes/index.tsx) — route loader and metadata.
+- [Generated API integration](../src/lib/api/) — client utilities and generated output.
+- [E2E test cases](../e2e/) — storefront navigation, donations, checkout and management scenarios.
+- [CI source](../.github/workflows/ci.yml) — quality and Playwright workflows; see current Actions runs for their actual status.
 
 ## Review walkthrough (5 minutes)
 
