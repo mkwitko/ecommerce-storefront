@@ -87,3 +87,9 @@ End-to-end scenarios require their documented environment and services; listing 
 ## Project media and status
 
 Screenshots and a public demonstration have **not yet been added** to this repository README. Add only real, redacted captures of the running app; avoid personal/customer data and unsupported deployment claims. This codebase is published for inspection, but **production-readiness has not been established by this README**.
+
+---
+
+## Engineering evidence
+
+[Engineering case study](docs/ENGINEERING_CASE_STUDY.md) — architecture decisions, implementation links, trade-offs and remaining verification work.
