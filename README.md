@@ -1,4 +1,4 @@
-# udv-shop (web)
+# ecommerce-storefront
 
 Web client for a community storefront: stores publish products, events, campaigns and raffles, take donations, and get paid by Pix or card.
 
@@ -17,27 +17,62 @@ Web client for a community storefront: stores publish products, events, campaign
 
 ## Architecture
 
+System context: this repo is the browser-facing half of a two-repo system.
+
 ```mermaid
 flowchart LR
-  Browser --> Worker[Cloudflare Worker<br/>TanStack Start SSR<br/>src/server.ts]
-  Worker --> Routes[File routes + loaders<br/>src/routes]
-  Routes --> Query[TanStack Query cache]
-  Query --> Client[Generated client<br/>src/lib/api/gen]
-  Client --> Fetch[fetch-client.ts]
-  Fetch -->|HTTP, refresh cookie| API[udv-shop-api]
-  Browser --> Stripe[Stripe.js / Connect embedded]
-  Browser --> Turnstile[Turnstile]
+  Buyer([Buyer / store owner]) --> Web[ecommerce-storefront<br/>Cloudflare Worker, SSR]
+  Web -->|REST, refresh cookie| API[ecommerce-api]
+  API --> Woovi[Woovi Pix]
+  API --> Stripe[Stripe]
+  Buyer -->|card data, Connect onboarding| StripeJS[Stripe.js in the browser]
+  Buyer --> Turnstile[Turnstile widget]
+  API -.->|docs/openapi.json, Kubb| Web
+```
+
+Layers inside this repo:
+
+```mermaid
+flowchart TD
+  Server["Worker entry<br/>src/server.ts"] --> Routes["File routes + loaders<br/>src/routes (public, gestao, account)"]
+  Routes --> Comp["Components<br/>src/components: pay, store, auth, site, ui"]
+  Routes --> Query["TanStack Query cache<br/>src/integrations/tanstack-query"]
+  Comp --> Query
+  Query --> Gen["Generated hooks, Zod schemas<br/>src/lib/api/gen"]
+  Gen --> Client["Single HTTP client<br/>src/lib/api/fetch-client.ts"]
+  Client --> Token["In-memory access token<br/>src/lib/api/auth-token.ts"]
+  Comp --> Rules["Pure rules: payout, raffle, campaign, format<br/>src/lib"]
+```
+
+Main flow, a Pix purchase (`src/routes/loja/$slug/comprar.tsx`, `src/components/pay/pix-panel.tsx`):
+
+```mermaid
+sequenceDiagram
+  participant B as Browser
+  participant A as ecommerce-api
+  participant P as Woovi
+  B->>A: checkout (items, provider=pix)
+  A-->>B: order + Pix copy-paste code, QR, expiry
+  B->>B: PixPanel shows code and countdown
+  B->>P: customer pays in their bank app
+  P->>A: signed webhook
+  loop poll while pending (useGetMyOrder / useGetOrderReceipt)
+    B->>A: GET order
+  end
+  A-->>B: order paid
+  B->>B: show receipt
 ```
 
 - No database and no server-side session: every read and write goes to the API.
 - Routes are file-based and loaders prefetch into the Query cache so SSR output hydrates without a second fetch.
 - The API client and Zod schemas are generated from the API's OpenAPI document; nothing under `src/lib/api/gen` is hand-written.
+- Payment confirmation is never decided here: the page polls the order until the API, which receives the provider webhook, reports it paid.
 - Card data never touches this app; it goes to Stripe from the browser.
 - Deployed as a Cloudflare Worker (`wrangler.jsonc`).
 
 ## Key decisions
 
-- Typed contract by codegen: Kubb reads `../udv-shop-api/docs/openapi.json` and emits types, Zod schemas, clients and hooks ([`kubb.config.ts`](kubb.config.ts)). Trade-off: the API repo must be checked out next to this one to regenerate.
+- Typed contract by codegen: Kubb reads `../ecommerce-api/docs/openapi.json` and emits types, Zod schemas, clients and hooks ([`kubb.config.ts`](kubb.config.ts)). Trade-off: the API repo must be checked out next to this one to regenerate.
 - Access token kept in memory only; the refresh token is an HTTP-only cookie set by the API ([`src/lib/api/auth-token.ts`](src/lib/api/auth-token.ts), [`src/lib/auth/session.tsx`](src/lib/auth/session.tsx)). Trade-off: a page reload costs one refresh call.
 - A single HTTP client owns base URL, token injection and error mapping ([`src/lib/api/fetch-client.ts`](src/lib/api/fetch-client.ts), tested in `fetch-client.test.ts`).
 - Money and dates are formatted in one place, in pt-BR ([`src/lib/format.ts`](src/lib/format.ts)); payout and raffle rules that need to be exact have their own tested modules ([`payout.ts`](src/lib/payout.ts), [`raffle.ts`](src/lib/raffle.ts)).
@@ -50,7 +85,7 @@ React 19, TypeScript, TanStack Start / Router / Query, Tailwind CSS v4, Radix pr
 
 ## Getting started
 
-Prerequisites: Node.js 22+, pnpm 10, and a running [udv-shop-api](https://github.com/mkwitko/udv-shop-api) (default `http://localhost:3333`).
+Prerequisites: Node.js 22+, pnpm 10, and a running [ecommerce-api](https://github.com/mkwitko/ecommerce-api) (default `http://localhost:3333`).
 
 ```bash
 cp .env.example .env     # placeholders only; see table below
@@ -68,9 +103,9 @@ pnpm dev                 # http://localhost:3000
 When the API contract changes, regenerate the client (no codegen is committed by hand):
 
 ```bash
-# in udv-shop-api
+# in ecommerce-api
 pnpm openapi:export
-# in this repo, with the API checked out at ../udv-shop-api
+# in this repo, with the API checked out at ../ecommerce-api
 pnpm api:generate
 ```
 
@@ -99,7 +134,7 @@ docs/              architecture, design system, case studies
 
 ## Related repositories
 
-- [udv-shop-api](https://github.com/mkwitko/udv-shop-api): the REST API this client consumes.
+- [ecommerce-api](https://github.com/mkwitko/ecommerce-api): the REST API this client consumes.
 
 ## License
 
