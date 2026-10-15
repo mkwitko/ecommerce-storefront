@@ -1,5 +1,7 @@
 # Community Storefront — Web
 
+**[Engineering case study: SSR, typed API integration and trade-offs](docs/PORTFOLIO_CASE_STUDY.md)**
+
 A React storefront and management interface for community organizations to sell products, manage stores, and receive donations. This repository contains the **web application**; the API lives in [udv-shop-api](https://github.com/mkwitko/udv-shop-api).
 
 > **Portfolio note:** This README describes code and workflows present in the repository. A public production deployment, customer adoption, and performance numbers have not been independently verified.
