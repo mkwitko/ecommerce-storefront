@@ -15,6 +15,32 @@ Web client for a community storefront: stores publish products, events, campaign
 - SEO: per-route meta, canonical links, JSON-LD, `sitemap.xml` and `robots.txt` server routes (`src/lib/seo.ts`).
 - Light and dark theme with an anti-flash script (`src/lib/theme.ts`).
 
+## Screenshots
+
+Demo store with fictitious seed data (demo campaign, invented phone number); payments run against a fake provider, so QR codes are placeholders. Product images are placeholder gradients.
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/01-catalog-desktop.png" alt="Store home with active campaign card"><br><sub>Store home with active campaign card.</sub></td>
+    <td width="50%"><img src="docs/screenshots/02-product-desktop.png" alt="Product page"><br><sub>Product page.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/03-campaigns-desktop.png" alt="Campaigns list with progress bar"><br><sub>Campaigns list with progress bar.</sub></td>
+    <td width="50%"><img src="docs/screenshots/04-raffle-campaign-desktop.png" alt="Campaign page with donate panel and raffle prizes"><br><sub>Campaign page with donate panel and raffle prizes.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/05-cart-checkout-desktop.png" alt="Checkout, step 1 of 2"><br><sub>Checkout, step 1 of 2.</sub></td>
+    <td width="50%"><img src="docs/screenshots/08-donation-desktop.png" alt="Donation, step 1 of 2"><br><sub>Donation, step 1 of 2.</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td width="25%"><img src="docs/screenshots/01-catalog-mobile.png" alt="Store home on mobile"><br><sub>Store home on mobile.</sub></td>
+    <td width="25%"><img src="docs/screenshots/02-product-mobile.png" alt="Product page on mobile"><br><sub>Product page on mobile.</sub></td>
+  </tr>
+</table>
+
 ## Architecture
 
 ```mermaid
