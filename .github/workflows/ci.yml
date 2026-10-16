@@ -53,7 +53,9 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm install --frozen-lockfile
+      # A API fica dentro do workspace da web; sem --ignore-workspace o pnpm instala o workspace
+      # pai e as dependências da API (tsx) não chegam ao node_modules dela.
+      - run: pnpm install --frozen-lockfile --ignore-workspace
         working-directory: udv-shop-api
       - name: prepara e sobe a API com pagamentos falsos
         working-directory: udv-shop-api
@@ -70,7 +72,7 @@ jobs:
           pnpm db:generate
           pnpm db:deploy
           pnpm db:seed
-          (npx tsx --env-file=.env src/server.ts &) && npx wait-on -t 60000 http://localhost:3333/health
+          (pnpm exec tsx --env-file=.env src/server.ts &) && npx wait-on -t 60000 http://localhost:3333/health
         env:
           DATABASE_URL: postgresql://udv:udv@localhost:5436/udvshop
       - run: pnpm exec playwright install --with-deps chromium

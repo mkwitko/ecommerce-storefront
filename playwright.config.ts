@@ -24,6 +24,9 @@ export default defineConfig({
     command: "pnpm dev",
     url: "http://localhost:3000",
     reuseExistingServer: true,
+    // sem chave publicável o cartão (e "Todo mês") fica indisponível; o teste de doação mensal
+    // só precisa da UI habilitada, nunca carrega o Stripe de verdade.
+    env: { ...(process.env as Record<string, string>), VITE_STRIPE_PUBLISHABLE_KEY: "pk_test_e2e_placeholder" },
     timeout: 120_000,
   },
 });
